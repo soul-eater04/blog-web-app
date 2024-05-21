@@ -10,11 +10,14 @@ export const metadata: Metadata = {
   description: "Blog project to learn nextjs and TypeScript",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+interface RootLayoutProps {
   children: React.ReactNode;
-}>) {
+  html: React.ReactNode;
+}
+
+export default function RootLayout({
+  children, html
+}: RootLayoutProps) {
   return (
     <html lang="en">
       <body className={inter.className}>

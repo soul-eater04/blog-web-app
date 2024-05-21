@@ -14,19 +14,26 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { useState } from "react";
 
 const formSchema = z.object({
   username: z.string().min(2).max(30),
-  password: z.string().min(8,{
-    message:"password must be between 8 and 30 characters",
-  }).max(30),
-})
+  password: z
+    .string()
+    .min(8, {
+      message: "password must be between 8 and 30 characters",
+    })
+    .max(30),
+});
 
 const login = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,15 +42,25 @@ const login = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const response = await axios.post('http://localhost:8000/api/users/login',values);
+      const { accessToken } = response.data;
+      localStorage.setItem('accessToken', accessToken);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   }
 
   return (
-    <Form {...form} >
+    <Form {...form}>
       <div className="h-screen flex flex-col justify-center items-center">
         <Card>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="p-8 flex flex-col space-y-4 w-80 border border-black rounded-lg">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="p-8 flex flex-col space-y-4 w-80 border border-black rounded-lg"
+          >
             <h1 className="font-bold underline text-xl">Log In</h1>
             <FormField
               control={form.control}
@@ -72,7 +89,9 @@ const login = () => {
               )}
             />
             <Button type="submit">Submit</Button>
-            <Link className="underline underline-offset-2 " href="/">Go back to home</Link>
+            <Link className="underline underline-offset-2 " href="/">
+              Go back to home
+            </Link>
           </form>
         </Card>
       </div>

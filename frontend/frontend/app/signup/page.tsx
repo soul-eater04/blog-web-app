@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import axios from "axios"
+
 const formSchema = z.object({
   username: z.string().min(2).max(30),
   email: z.string().email({
@@ -38,7 +40,8 @@ const signup = () => {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    console.log(JSON.stringify(values))
+    axios.post('http://localhost:8000/api/users/signup',values)
   }
 
   return (
